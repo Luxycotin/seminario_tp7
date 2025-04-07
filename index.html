@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplicación de Matrices</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        div {
+            margin-bottom: 20px;
+        }
+
+        input {
+            margin: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        #matrices-input div {
+            margin-bottom: 10px;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multiplicación de dos matrices</h1>
+    <div>
+        <label for="filasA">Cantidad de filas de la Matriz 1:</label>
+        <input type="number" id="filasA" required>
+        <label for="columnasA">Cantidad de columnas de la Matriz 1:</label>
+        <input type="number" id="columnasA" required>
+        <label for="filasB">Cantidad de filas de la Matriz 2:</label>
+        <input type="number" id="filasB" required>
+        <label for="columnasB">Cantidad de columnas de la Matriz 2:</label>
+        <input type="number" id="columnasB" required>
+        <button onclick="mostrarMatrices()">Generar matrices</button>
+    </div>
+
+    <div id="matrices-input" style="display:none;">
+        <h3>Matriz 1</h3>
+        <div id="matriz1"></div>
+
+        <h3>Matriz 2</h3>
+        <div id="matriz2"></div>
+
+        <button onclick="multiplicarMatrices()">Multiplicar Matrices</button>
+    </div>
+
+    <h3>Resultado:</h3>
+    <div id="resultado"></div>
+
+    <script>
+        function mostrarMatrices() {
+            const filasA = document.getElementById("filasA").value;
+            const columnasA = document.getElementById("columnasA").value;
+            const filasB = document.getElementById("filasB").value;
+            const columnasB = document.getElementById("columnasB").value;
+
+            if (columnasA != filasB) {
+                alert("El número de columnas de la Matriz 1 debe ser igual al número de filas de la Matriz 2.");
+                return;
+            }
+
+            let matriz1HTML = '';
+            let matriz2HTML = '';
+
+            for (let i = 0; i < filasA; i++) {
+                matriz1HTML += `<div>`;
+                for (let j = 0; j < columnasA; j++) {
+                    matriz1HTML += `<input type="number" id="m1-${i}-${j}" placeholder="M1-${i}-${j}">`;
+                }
+                matriz1HTML += `</div>`;
+            }
+
+            for (let i = 0; i < filasB; i++) {
+                matriz2HTML += `<div>`;
+                for (let j = 0; j < columnasB; j++) {
+                    matriz2HTML += `<input type="number" id="m2-${i}-${j}" placeholder="M2-${i}-${j}">`;
+                }
+                matriz2HTML += `</div>`;
+            }
+
+            document.getElementById("matriz1").innerHTML = matriz1HTML;
+            document.getElementById("matriz2").innerHTML = matriz2HTML;
+
+            document.getElementById("matrices-input").style.display = 'block';
+        }
+
+        function multiplicarMatrices() {
+            const filasA = document.getElementById("filasA").value;
+            const columnasA = document.getElementById("columnasA").value;
+            const filasB = document.getElementById("filasB").value;
+            const columnasB = document.getElementById("columnasB").value;
+
+            const matriz1 = [];
+            const matriz2 = [];
+
+            for (let i = 0; i < filasA; i++) {
+                matriz1[i] = [];
+                for (let j = 0; j < columnasA; j++) {
+                    const m1 = document.getElementById(`m1-${i}-${j}`).value;
+                    if (isNaN(m1)) {
+                        alert("Por favor, ingresa valores numéricos válidos.");
+                        return;
+                    }
+                    matriz1[i].push(Number(m1));
+                }
+            }
+
+            for (let i = 0; i < filasB; i++) {
+                matriz2[i] = [];
+                for (let j = 0; j < columnasB; j++) {
+                    const m2 = document.getElementById(`m2-${i}-${j}`).value;
+                    if (isNaN(m2)) {
+                        alert("Por favor, ingresa valores numéricos válidos.");
+                        return;
+                    }
+                    matriz2[i].push(Number(m2));
+                }
+            }
+
+            fetch('/multiplicar-matrices', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ matriz1, matriz2 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                mostrarResultado(data.resultado);
+            })
+            .catch(error => {
+                console.error('Error al multiplicar matrices:', error);
+            });
+        }
+
+        function mostrarResultado(resultado) {
+            const resultadoHTML = resultado.map(fila => fila.join(' ')).join('<br>');
+            document.getElementById("resultado").innerHTML = resultadoHTML;
+        }
+    </script>
+</body>
+</html>
