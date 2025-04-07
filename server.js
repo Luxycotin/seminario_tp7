@@ -14,7 +14,7 @@ app.post('/multiplicar-matrices', (req, res) => {
     const columnasB = matriz2[0].length;
 
     if (columnasA !== filasB) {
-        return res.status(400).json({ error: 'El número de columnas de la primera matriz debe coincidir con el número de filas de la segunda matriz.' });
+        return res.status(400).json({ error: 'El número de las columnas de la primera matriz debe coincidir con el número de filas de la segunda matriz.' });
     }
 
     const resultado = [];
